@@ -15,13 +15,13 @@ const app = express();
 ========================= */
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://soundsbridge.netlify.app", // ❌ no trailing slash
+  "https://soundsbridge.netlify.app",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (Postman, server-to-server)
+      // Allow Postman / server-to-server requests
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
@@ -30,14 +30,11 @@ app.use(
         return callback(new Error("Not allowed by CORS"));
       }
     },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
-
-// 🔑 Handle preflight requests
-app.options("*", cors());
 
 /* =========================
    MIDDLEWARE
@@ -51,7 +48,7 @@ app.use("/api/leads", leadRoutes);
 app.use("/api/admin", adminRoutes);
 
 /* =========================
-   DB CONNECTION
+   DB
 ========================= */
 mongoose
   .connect(process.env.MONGO_URI)
