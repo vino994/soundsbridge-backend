@@ -1,27 +1,26 @@
-import nodemailer from "nodemailer";
+import SibApiV3Sdk from "sib-api-v3-sdk";
 
 const sendEmail = async ({ to, subject, html }) => {
   try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+    const client = SibApiV3Sdk.ApiClient.instance;
+    const apiKey = client.authentications["api-key"];
+    apiKey.apiKey = process.env.BREVO_API_KEY;
+
+    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+
+    await apiInstance.sendTransacEmail({
+      sender: {
+        email: process.env.EMAIL_FROM,
+        name: "SoundBridge CRM",
       },
-    });
-
-    await transporter.sendMail({
-      from: `"SoundBridge CRM" <${process.env.EMAIL_FROM}>`,
-      to,
+      to: [{ email: to }],
       subject,
-      html,
+      htmlContent: html,
     });
 
-    console.log("📧 Client notification email sent");
+    console.log("📧 Email sent via Brevo API");
   } catch (err) {
-    console.error("❌ Email send failed:", err.message);
+    console.error("❌ Brevo API email failed:", err.message);
   }
 };
 
