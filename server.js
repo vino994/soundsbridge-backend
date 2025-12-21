@@ -11,30 +11,35 @@ dotenv.config();
 const app = express();
 
 /* =========================
-   ✅ CORS CONFIG (FIXED)
+   CORS CONFIG (CORRECT)
 ========================= */
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://soundsbridge-vercel.vercel.app/",
+  "https://soundsbridge-vercel.vercel.app",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow Postman / server-to-server requests
       if (!origin) return callback(null, true);
+
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "https://soundsbridge-vercel.vercel.app",
+      ];
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
-      } else {
-        return callback(new Error("Not allowed by CORS"));
       }
+      return callback(new Error("Not allowed by CORS"));
     },
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
+
+
 
 /* =========================
    MIDDLEWARE
