@@ -15,7 +15,7 @@ const app = express();
 ========================= */
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://soundsbridge.netlify.app",
+  "https://soundsbridge-vercel.vercel.app/",
 ];
 
 app.use(
