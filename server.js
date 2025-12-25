@@ -26,6 +26,7 @@ app.use(
       const allowedOrigins = [
         "http://localhost:5173",
         "https://soundsbridge-vercel.vercel.app",
+        "https://soundsbridge-backend.onrender.com"
       ];
 
       if (allowedOrigins.includes(origin)) {
