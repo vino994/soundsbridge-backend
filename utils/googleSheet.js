@@ -7,15 +7,45 @@ const auth = new google.auth.GoogleAuth({
 
 export async function saveLeadToGoogleSheet(lead) {
   try {
-    console.log("📄 Google Sheet save started");
-
     const sheets = google.sheets({
       version: "v4",
       auth: await auth.getClient(),
     });
 
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+
+    const headers = [
+      "Name",
+      "Email",
+      "Phone",
+      "Preferred Date",
+      "Age Group",
+      "Has Hearing Aid",
+      "Issue",
+      "Urgency",
+      "Created At",
+    ];
+
+    // 🔹 Check if header already exists
+    const headerCheck = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "Sheet1!A1:I1",
+    });
+
+    if (!headerCheck.data.values || headerCheck.data.values.length === 0) {
+      await sheets.spreadsheets.values.append({
+        spreadsheetId,
+        range: "Sheet1!A1",
+        valueInputOption: "USER_ENTERED",
+        requestBody: {
+          values: [headers],
+        },
+      });
+    }
+
+    // 🔹 Insert Lead Row
     await sheets.spreadsheets.values.append({
-      spreadsheetId: process.env.GOOGLE_SHEET_ID,
+      spreadsheetId,
       range: "Sheet1!A:I",
       valueInputOption: "USER_ENTERED",
       requestBody: {
@@ -28,16 +58,13 @@ export async function saveLeadToGoogleSheet(lead) {
           lead.qualification?.hasHearingAid || "",
           lead.qualification?.issue || "",
           lead.qualification?.urgency || "",
-          new Date().toISOString(),
+          new Date().toLocaleString("en-IN"),
         ]],
       },
     });
 
     console.log("✅ Google Sheet updated successfully");
   } catch (err) {
-    console.error(
-      "❌ Google Sheet save failed:",
-      err.response?.data || err.message
-    );
+    console.error("❌ Google Sheet save failed:", err.message);
   }
 }
